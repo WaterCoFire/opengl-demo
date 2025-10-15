@@ -1,0 +1,272 @@
+/* Basic GLFW3 Example and GLAD example
+   with an OpenGL context for AC41001/AC51008, 
+   Iain Martin 2022.
+   
+/* Link to libraries, could define these as linker inputs in the project settings instead if you prefer */
+#ifdef _DEBUG
+#pragma comment(lib, "glfw3D.lib")
+#else
+#pragma comment(lib, "glfw3.lib")
+#endif
+
+// Link to basic OpenGL functinoality (not enough on its own)
+#pragma comment(lib, "opengl32.lib")
+
+/* Include standard libraries */
+#include <stdlib.h>
+#include <stdio.h>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <vector>
+
+/* Include GL_Load and GLFW headers */
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+/* Define some global objects that we'll use to render */
+GLuint positionBufferObject;
+GLuint program;
+GLuint vao;
+GLfloat x;
+GLfloat inc;
+
+/* Array of vertex positions */
+GLfloat vertexPositions[] = {
+    0.75f, 0.75f, 0.0f, 1.0f,
+    0.75f, -0.75f, 0.0f, 1.0f,
+    -0.75f, -0.75f, 0.0f, 1.0f,
+};
+
+/* Build shaders from strings containing shader source code */
+GLuint BuildShader(GLenum eShaderType, const std::string &shaderText) {
+    GLuint shader = glCreateShader(eShaderType);
+    const char *strFileData = shaderText.c_str();
+    glShaderSource(shader, 1, &strFileData, NULL);
+
+    glCompileShader(shader);
+
+    GLint status;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+    if (status == GL_FALSE) {
+        // Output the compile errors
+
+        GLint infoLogLength;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLength);
+
+        GLchar *strInfoLog = new GLchar[GLint(infoLogLength) + 1];
+        glGetShaderInfoLog(shader, infoLogLength, NULL, strInfoLog);
+
+        const char *strShaderType = NULL;
+        switch (eShaderType) {
+            case GL_VERTEX_SHADER: strShaderType = "vertex";
+                break;
+            case GL_GEOMETRY_SHADER: strShaderType = "geometry";
+                break;
+            case GL_FRAGMENT_SHADER: strShaderType = "fragment";
+                break;
+        }
+
+        std::cerr << "Compile error in " << strShaderType << "\n\t" << strInfoLog << std::endl;
+        delete[] strInfoLog;
+
+        // Personal modification: From std::exception to std::runtime_error
+        throw std::runtime_error("Shader compile exception");
+    }
+
+    return shader;
+}
+
+/* Error callback, outputs error to stl error stream */
+static void error_callback(int error, const char *description) {
+    fputs(description, stderr);
+}
+
+/* Key response callback */
+static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
+}
+
+/* Window reshape callback
+   Called whenever the window is resized. The new window size is given, in pixels. */
+static void reshape(GLFWwindow *window, int w, int h) {
+    glViewport(0, 0, (GLsizei) w, (GLsizei) h);
+}
+
+
+/* Our own initialisation function */
+void init() {
+    /* Define animation variables */
+    x = 0;
+    inc = 0.001f;
+
+    /* Create a vertex buffer object to store our array of vertices */
+    /* A vertext buffer is a memory object that is created and owned by
+       the OpenGL context */
+
+    /* Generate buffer names (unique index identifiers) */
+    glGenBuffers(1, &positionBufferObject);
+
+    /* Specify the current active buffer object by identifer */
+    glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
+
+    /* Allocates OpenGL memory for storing data or indices, any data
+       previously defined is deleted*/
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_DYNAMIC_DRAW);
+
+    /* Stop using buffer object for target (GL_ARRAY_BUFFER) because buffer name = 0*/
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    /* Define the vertex shader code as a string */
+    // Personal modification: From 330 to 410 core
+    const std::string vertexShader(
+        "#version 410 core\n"
+        "layout(location = 0) in vec4 position;\n"
+        "void main()\n"
+        "{\n"
+        "   gl_Position = position;\n"
+        "}\n"
+    );
+
+    /* Define the fragment shader as a string */
+    // Personal modification: From 330 to 410 core
+    const std::string fragmentShader(
+        "#version 410 core\n"
+        "out vec4 outputColor;\n"
+        "void main()\n"
+        "{\n"
+        "   outputColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);\n"
+        "}\n"
+    );
+
+    /* Build both shaders */
+    GLuint vertShader = BuildShader(GL_VERTEX_SHADER, vertexShader);
+    GLuint fragShader = BuildShader(GL_FRAGMENT_SHADER, fragmentShader);
+
+    /* Create a shader program object and link the vertex and fragment shaders
+    into a single shader program */
+    program = glCreateProgram();
+    glAttachShader(program, vertShader);
+    glAttachShader(program, fragShader);
+    glLinkProgram(program);
+
+    /* Output and shader compilation errors */
+    GLint status;
+    glGetProgramiv(program, GL_LINK_STATUS, &status);
+    if (status == GL_FALSE) {
+        GLint infoLogLength;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &infoLogLength);
+
+        GLchar *strInfoLog = new GLchar[GLint(infoLogLength) + 1];
+        glGetProgramInfoLog(program, infoLogLength, NULL, strInfoLog);
+        fprintf(stderr, "Linker failure: %s\n", strInfoLog);
+        delete[] strInfoLog;
+        throw std::runtime_error("Shader could not be linked.");
+    }
+}
+
+
+/* Rendering function */
+void display() {
+    vertexPositions[0] = x;
+
+    /* Update the vertext buffer object with the modified array of vertices */
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_DYNAMIC_DRAW);
+
+    /* Define the background colour*/
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    /* Set the current shader program to be used */
+    glUseProgram(program);
+
+    /* Set the current active buffer object */
+    glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
+
+    /* Specifies where the dat values accociated with index can accessed in the vertex shader */
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+    /* Enable  the vertex array associated with the index*/
+    glEnableVertexAttribArray(0);
+
+    /* Constructs a sequence of geometric primitives using the elements from the currently
+       bound matrix */
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    /* Disable vertex array and shader program */
+    glDisableVertexAttribArray(0);
+    glUseProgram(0);
+}
+
+/* Standard main progrm */
+int main(void) {
+    GLFWwindow *window;
+
+    /* Register the error callback first to enable any GLFW errors to be processed*/
+    glfwSetErrorCallback(error_callback);
+
+    /* Init GLFW */
+    if (!glfwInit())
+        exit(EXIT_FAILURE);
+
+    // Personal modification: BELOW
+
+    // 设置 OpenGL 的版本号：4.1
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // 主版本号
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1); // 次版本号
+    // 使用“核心模式”（Core Profile）
+    // 表示只启用现代 OpenGL 的功能，不兼容旧版接口
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#ifdef __APPLE__
+    // macOS 特殊要求：必须设置“前向兼容（Forward Compatible）”
+    // 否则会因为默认禁用 Core Profile 而崩溃
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
+    /* Create a GLFW window, bail out if it doesn't work */
+    window = glfwCreateWindow(640, 480, "Hello Graphics World", NULL, NULL);
+    if (!window) {
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+
+    /* Associate an OpenGL context with the recently created GLFW window */
+    glfwMakeContextCurrent(window);
+
+    // glad: load all OpenGL function pointers
+    // ---------------------------------------
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+        std::cout << "Failed to initialize GLAD. Exiting." << std::endl;
+        return -1;
+    }
+
+    /* Register callbacks for keyboard and window resize */
+    glfwSetKeyCallback(window, key_callback);
+    glfwSetFramebufferSizeCallback(window, reshape);
+
+    /* Call our own function to perform any setup work*/
+    init();
+
+    /* The event loop */
+    while (!glfwWindowShouldClose(window)) {
+        /* Call our own drawing function */
+        display();
+
+        /* Swap buffers: GLFW is double buffered as standard */
+        glfwSwapBuffers(window);
+
+        /* Processes registered events, causes the callbacks to be called.*/
+        glfwPollEvents();
+
+        /* Modify our animation variables */
+        x += inc;
+        if (x >= 2 || x <= 0) inc = -inc;
+    }
+
+    /* Clean up */
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    exit(EXIT_SUCCESS);
+}
