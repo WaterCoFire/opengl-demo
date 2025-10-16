@@ -1,0 +1,1 @@
+-I"E:/Project/ClangProjects/opengl-demo/common" -I"E:/Project/ClangProjects/opengl-demo/include" -I"E:/Project/ClangProjects/opengl-demo/include/glad" -I"E:/Project/ClangProjects/opengl-demo/include/GLFW" -I"E:/Project/ClangProjects/opengl-demo/include/glm" -I"E:/Project/ClangProjects/opengl-demo/include/KNR" -I"D:/glfw-3.4.bin.WIN64/include"

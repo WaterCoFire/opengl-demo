@@ -1,452 +1,73 @@
-cmake_minimum_required(VERSION 4.0)
+cmake_minimum_required(VERSION 3.15)
 project(first_programs)
 
 set(CMAKE_CXX_STANDARD 17)
 
-include_directories(common)
-include_directories(include)
-include_directories(include/glad)
-include_directories(include/GLFW)
-include_directories(include/glm)
-include_directories(include/glm/detail)
-include_directories(include/glm/ext)
-include_directories(include/glm/gtc)
-include_directories(include/glm/gtx)
-include_directories(include/glm/simd)
-include_directories(include/KHR)
+# Public include directories
+include_directories(common include include/glad include/GLFW include/glm include/KNR)
 
-# 找到系统的 OpenGL
+# Detect OS
+if(WIN32)
+    message(STATUS ">>> Building on Windows <<<")
+    # glfw-3.4.bin.WIN64 is in D:\. Change accordingly if any changes take place.
+    set(GLFW_DIR "D:/glfw-3.4.bin.WIN64")
+    include_directories(${GLFW_DIR}/include)
+    link_directories(${GLFW_DIR}/lib-mingw-w64)  # If using MSVC, change to lib-vc2022 or lib-vc2023
+
+elseif(APPLE)
+    message(STATUS ">>> Building on macOS <<<")
+    # GLFW & GLM installed via Homebrew in macOS
+    include_directories(/opt/homebrew/include)
+    link_directories(/opt/homebrew/lib)
+endif()
+
+# Find OpenGL
 find_package(OpenGL REQUIRED)
 
-# 头文件路径
-include_directories(include)
+# General GLAD/GLFW wrapper
+# This way, COMMON_SRC = ["common/glad.c", "common/wrapper_glfw.cpp", "common/wrapper_glfw.h"]
+set(COMMON_SRC
+    common/glad.c
+    common/wrapper_glfw.cpp
+    common/wrapper_glfw.h
+)
 
-# 通过 Homebrew 安装的 GLFW & GLM
-include_directories(/opt/homebrew/include)
-link_directories(/opt/homebrew/lib)
+# Three separate .cpp demos so a target is generated for each one
 
-add_executable(first_programs
-        common/glad.c
-        common/wrapper_glfw.cpp
-        common/wrapper_glfw.h
-        graphics_examples/basic/basic.cpp
-        graphics_examples/basic_wrapper/basic.cpp
-        graphics_examples/vertex_attribs/vertex_attribs.cpp
-        include/glad/glad.h
-        include/GLFW/glfw3.h
-        include/GLFW/glfw3native.h
-        include/glm/detail/_features.hpp
-        include/glm/detail/_fixes.hpp
-        include/glm/detail/_noise.hpp
-        include/glm/detail/_swizzle.hpp
-        include/glm/detail/_swizzle_func.hpp
-        include/glm/detail/_vectorize.hpp
-        include/glm/detail/compute_common.hpp
-        include/glm/detail/compute_vector_relational.hpp
-        include/glm/detail/func_common.inl
-        include/glm/detail/func_common_simd.inl
-        include/glm/detail/func_exponential.inl
-        include/glm/detail/func_exponential_simd.inl
-        include/glm/detail/func_geometric.inl
-        include/glm/detail/func_geometric_simd.inl
-        include/glm/detail/func_integer.inl
-        include/glm/detail/func_integer_simd.inl
-        include/glm/detail/func_matrix.inl
-        include/glm/detail/func_matrix_simd.inl
-        include/glm/detail/func_packing.inl
-        include/glm/detail/func_packing_simd.inl
-        include/glm/detail/func_trigonometric.inl
-        include/glm/detail/func_trigonometric_simd.inl
-        include/glm/detail/func_vector_relational.inl
-        include/glm/detail/func_vector_relational_simd.inl
-        include/glm/detail/glm.cpp
-        include/glm/detail/qualifier.hpp
-        include/glm/detail/setup.hpp
-        include/glm/detail/type_float.hpp
-        include/glm/detail/type_half.hpp
-        include/glm/detail/type_half.inl
-        include/glm/detail/type_mat2x2.hpp
-        include/glm/detail/type_mat2x2.inl
-        include/glm/detail/type_mat2x3.hpp
-        include/glm/detail/type_mat2x3.inl
-        include/glm/detail/type_mat2x4.hpp
-        include/glm/detail/type_mat2x4.inl
-        include/glm/detail/type_mat3x2.hpp
-        include/glm/detail/type_mat3x2.inl
-        include/glm/detail/type_mat3x3.hpp
-        include/glm/detail/type_mat3x3.inl
-        include/glm/detail/type_mat3x4.hpp
-        include/glm/detail/type_mat3x4.inl
-        include/glm/detail/type_mat4x2.hpp
-        include/glm/detail/type_mat4x2.inl
-        include/glm/detail/type_mat4x3.hpp
-        include/glm/detail/type_mat4x3.inl
-        include/glm/detail/type_mat4x4.hpp
-        include/glm/detail/type_mat4x4.inl
-        include/glm/detail/type_mat4x4_simd.inl
-        include/glm/detail/type_quat.hpp
-        include/glm/detail/type_quat.inl
-        include/glm/detail/type_quat_simd.inl
-        include/glm/detail/type_vec1.hpp
-        include/glm/detail/type_vec1.inl
-        include/glm/detail/type_vec2.hpp
-        include/glm/detail/type_vec2.inl
-        include/glm/detail/type_vec3.hpp
-        include/glm/detail/type_vec3.inl
-        include/glm/detail/type_vec4.hpp
-        include/glm/detail/type_vec4.inl
-        include/glm/detail/type_vec4_simd.inl
-        include/glm/ext/matrix_clip_space.hpp
-        include/glm/ext/matrix_clip_space.inl
-        include/glm/ext/matrix_common.hpp
-        include/glm/ext/matrix_common.inl
-        include/glm/ext/matrix_double2x2.hpp
-        include/glm/ext/matrix_double2x2_precision.hpp
-        include/glm/ext/matrix_double2x3.hpp
-        include/glm/ext/matrix_double2x3_precision.hpp
-        include/glm/ext/matrix_double2x4.hpp
-        include/glm/ext/matrix_double2x4_precision.hpp
-        include/glm/ext/matrix_double3x2.hpp
-        include/glm/ext/matrix_double3x2_precision.hpp
-        include/glm/ext/matrix_double3x3.hpp
-        include/glm/ext/matrix_double3x3_precision.hpp
-        include/glm/ext/matrix_double3x4.hpp
-        include/glm/ext/matrix_double3x4_precision.hpp
-        include/glm/ext/matrix_double4x2.hpp
-        include/glm/ext/matrix_double4x2_precision.hpp
-        include/glm/ext/matrix_double4x3.hpp
-        include/glm/ext/matrix_double4x3_precision.hpp
-        include/glm/ext/matrix_double4x4.hpp
-        include/glm/ext/matrix_double4x4_precision.hpp
-        include/glm/ext/matrix_float2x2.hpp
-        include/glm/ext/matrix_float2x2_precision.hpp
-        include/glm/ext/matrix_float2x3.hpp
-        include/glm/ext/matrix_float2x3_precision.hpp
-        include/glm/ext/matrix_float2x4.hpp
-        include/glm/ext/matrix_float2x4_precision.hpp
-        include/glm/ext/matrix_float3x2.hpp
-        include/glm/ext/matrix_float3x2_precision.hpp
-        include/glm/ext/matrix_float3x3.hpp
-        include/glm/ext/matrix_float3x3_precision.hpp
-        include/glm/ext/matrix_float3x4.hpp
-        include/glm/ext/matrix_float3x4_precision.hpp
-        include/glm/ext/matrix_float4x2.hpp
-        include/glm/ext/matrix_float4x2_precision.hpp
-        include/glm/ext/matrix_float4x3.hpp
-        include/glm/ext/matrix_float4x3_precision.hpp
-        include/glm/ext/matrix_float4x4.hpp
-        include/glm/ext/matrix_float4x4_precision.hpp
-        include/glm/ext/matrix_projection.hpp
-        include/glm/ext/matrix_projection.inl
-        include/glm/ext/matrix_relational.hpp
-        include/glm/ext/matrix_relational.inl
-        include/glm/ext/matrix_transform.hpp
-        include/glm/ext/matrix_transform.inl
-        include/glm/ext/quaternion_common.hpp
-        include/glm/ext/quaternion_common.inl
-        include/glm/ext/quaternion_common_simd.inl
-        include/glm/ext/quaternion_double.hpp
-        include/glm/ext/quaternion_double_precision.hpp
-        include/glm/ext/quaternion_exponential.hpp
-        include/glm/ext/quaternion_exponential.inl
-        include/glm/ext/quaternion_float.hpp
-        include/glm/ext/quaternion_float_precision.hpp
-        include/glm/ext/quaternion_geometric.hpp
-        include/glm/ext/quaternion_geometric.inl
-        include/glm/ext/quaternion_relational.hpp
-        include/glm/ext/quaternion_relational.inl
-        include/glm/ext/quaternion_transform.hpp
-        include/glm/ext/quaternion_transform.inl
-        include/glm/ext/quaternion_trigonometric.hpp
-        include/glm/ext/quaternion_trigonometric.inl
-        include/glm/ext/scalar_common.hpp
-        include/glm/ext/scalar_common.inl
-        include/glm/ext/scalar_constants.hpp
-        include/glm/ext/scalar_constants.inl
-        include/glm/ext/scalar_float_sized.hpp
-        include/glm/ext/scalar_int_sized.hpp
-        include/glm/ext/scalar_integer.hpp
-        include/glm/ext/scalar_integer.inl
-        include/glm/ext/scalar_relational.hpp
-        include/glm/ext/scalar_relational.inl
-        include/glm/ext/scalar_uint_sized.hpp
-        include/glm/ext/scalar_ulp.hpp
-        include/glm/ext/scalar_ulp.inl
-        include/glm/ext/vector_bool1.hpp
-        include/glm/ext/vector_bool1_precision.hpp
-        include/glm/ext/vector_bool2.hpp
-        include/glm/ext/vector_bool2_precision.hpp
-        include/glm/ext/vector_bool3.hpp
-        include/glm/ext/vector_bool3_precision.hpp
-        include/glm/ext/vector_bool4.hpp
-        include/glm/ext/vector_bool4_precision.hpp
-        include/glm/ext/vector_common.hpp
-        include/glm/ext/vector_common.inl
-        include/glm/ext/vector_double1.hpp
-        include/glm/ext/vector_double1_precision.hpp
-        include/glm/ext/vector_double2.hpp
-        include/glm/ext/vector_double2_precision.hpp
-        include/glm/ext/vector_double3.hpp
-        include/glm/ext/vector_double3_precision.hpp
-        include/glm/ext/vector_double4.hpp
-        include/glm/ext/vector_double4_precision.hpp
-        include/glm/ext/vector_float1.hpp
-        include/glm/ext/vector_float1_precision.hpp
-        include/glm/ext/vector_float2.hpp
-        include/glm/ext/vector_float2_precision.hpp
-        include/glm/ext/vector_float3.hpp
-        include/glm/ext/vector_float3_precision.hpp
-        include/glm/ext/vector_float4.hpp
-        include/glm/ext/vector_float4_precision.hpp
-        include/glm/ext/vector_int1.hpp
-        include/glm/ext/vector_int1_precision.hpp
-        include/glm/ext/vector_int2.hpp
-        include/glm/ext/vector_int2_precision.hpp
-        include/glm/ext/vector_int3.hpp
-        include/glm/ext/vector_int3_precision.hpp
-        include/glm/ext/vector_int4.hpp
-        include/glm/ext/vector_int4_precision.hpp
-        include/glm/ext/vector_integer.hpp
-        include/glm/ext/vector_integer.inl
-        include/glm/ext/vector_relational.hpp
-        include/glm/ext/vector_relational.inl
-        include/glm/ext/vector_uint1.hpp
-        include/glm/ext/vector_uint1_precision.hpp
-        include/glm/ext/vector_uint2.hpp
-        include/glm/ext/vector_uint2_precision.hpp
-        include/glm/ext/vector_uint3.hpp
-        include/glm/ext/vector_uint3_precision.hpp
-        include/glm/ext/vector_uint4.hpp
-        include/glm/ext/vector_uint4_precision.hpp
-        include/glm/ext/vector_ulp.hpp
-        include/glm/ext/vector_ulp.inl
-        include/glm/gtc/bitfield.hpp
-        include/glm/gtc/bitfield.inl
-        include/glm/gtc/color_space.hpp
-        include/glm/gtc/color_space.inl
-        include/glm/gtc/constants.hpp
-        include/glm/gtc/constants.inl
-        include/glm/gtc/epsilon.hpp
-        include/glm/gtc/epsilon.inl
-        include/glm/gtc/integer.hpp
-        include/glm/gtc/integer.inl
-        include/glm/gtc/matrix_access.hpp
-        include/glm/gtc/matrix_access.inl
-        include/glm/gtc/matrix_integer.hpp
-        include/glm/gtc/matrix_inverse.hpp
-        include/glm/gtc/matrix_inverse.inl
-        include/glm/gtc/matrix_transform.hpp
-        include/glm/gtc/matrix_transform.inl
-        include/glm/gtc/noise.hpp
-        include/glm/gtc/noise.inl
-        include/glm/gtc/packing.hpp
-        include/glm/gtc/packing.inl
-        include/glm/gtc/quaternion.hpp
-        include/glm/gtc/quaternion.inl
-        include/glm/gtc/quaternion_simd.inl
-        include/glm/gtc/random.hpp
-        include/glm/gtc/random.inl
-        include/glm/gtc/reciprocal.hpp
-        include/glm/gtc/reciprocal.inl
-        include/glm/gtc/round.hpp
-        include/glm/gtc/round.inl
-        include/glm/gtc/type_aligned.hpp
-        include/glm/gtc/type_precision.hpp
-        include/glm/gtc/type_precision.inl
-        include/glm/gtc/type_ptr.hpp
-        include/glm/gtc/type_ptr.inl
-        include/glm/gtc/ulp.hpp
-        include/glm/gtc/ulp.inl
-        include/glm/gtc/vec1.hpp
-        include/glm/gtx/associated_min_max.hpp
-        include/glm/gtx/associated_min_max.inl
-        include/glm/gtx/bit.hpp
-        include/glm/gtx/bit.inl
-        include/glm/gtx/closest_point.hpp
-        include/glm/gtx/closest_point.inl
-        include/glm/gtx/color_encoding.hpp
-        include/glm/gtx/color_encoding.inl
-        include/glm/gtx/color_space.hpp
-        include/glm/gtx/color_space.inl
-        include/glm/gtx/color_space_YCoCg.hpp
-        include/glm/gtx/color_space_YCoCg.inl
-        include/glm/gtx/common.hpp
-        include/glm/gtx/common.inl
-        include/glm/gtx/compatibility.hpp
-        include/glm/gtx/compatibility.inl
-        include/glm/gtx/component_wise.hpp
-        include/glm/gtx/component_wise.inl
-        include/glm/gtx/dual_quaternion.hpp
-        include/glm/gtx/dual_quaternion.inl
-        include/glm/gtx/easing.hpp
-        include/glm/gtx/easing.inl
-        include/glm/gtx/euler_angles.hpp
-        include/glm/gtx/euler_angles.inl
-        include/glm/gtx/extend.hpp
-        include/glm/gtx/extend.inl
-        include/glm/gtx/extended_min_max.hpp
-        include/glm/gtx/extended_min_max.inl
-        include/glm/gtx/exterior_product.hpp
-        include/glm/gtx/exterior_product.inl
-        include/glm/gtx/fast_exponential.hpp
-        include/glm/gtx/fast_exponential.inl
-        include/glm/gtx/fast_square_root.hpp
-        include/glm/gtx/fast_square_root.inl
-        include/glm/gtx/fast_trigonometry.hpp
-        include/glm/gtx/fast_trigonometry.inl
-        include/glm/gtx/float_notmalize.inl
-        include/glm/gtx/functions.hpp
-        include/glm/gtx/functions.inl
-        include/glm/gtx/gradient_paint.hpp
-        include/glm/gtx/gradient_paint.inl
-        include/glm/gtx/handed_coordinate_space.hpp
-        include/glm/gtx/handed_coordinate_space.inl
-        include/glm/gtx/hash.hpp
-        include/glm/gtx/hash.inl
-        include/glm/gtx/integer.hpp
-        include/glm/gtx/integer.inl
-        include/glm/gtx/intersect.hpp
-        include/glm/gtx/intersect.inl
-        include/glm/gtx/io.hpp
-        include/glm/gtx/io.inl
-        include/glm/gtx/log_base.hpp
-        include/glm/gtx/log_base.inl
-        include/glm/gtx/matrix_cross_product.hpp
-        include/glm/gtx/matrix_cross_product.inl
-        include/glm/gtx/matrix_decompose.hpp
-        include/glm/gtx/matrix_decompose.inl
-        include/glm/gtx/matrix_factorisation.hpp
-        include/glm/gtx/matrix_factorisation.inl
-        include/glm/gtx/matrix_interpolation.hpp
-        include/glm/gtx/matrix_interpolation.inl
-        include/glm/gtx/matrix_major_storage.hpp
-        include/glm/gtx/matrix_major_storage.inl
-        include/glm/gtx/matrix_operation.hpp
-        include/glm/gtx/matrix_operation.inl
-        include/glm/gtx/matrix_query.hpp
-        include/glm/gtx/matrix_query.inl
-        include/glm/gtx/matrix_transform_2d.hpp
-        include/glm/gtx/matrix_transform_2d.inl
-        include/glm/gtx/mixed_product.hpp
-        include/glm/gtx/mixed_product.inl
-        include/glm/gtx/norm.hpp
-        include/glm/gtx/norm.inl
-        include/glm/gtx/normal.hpp
-        include/glm/gtx/normal.inl
-        include/glm/gtx/normalize_dot.hpp
-        include/glm/gtx/normalize_dot.inl
-        include/glm/gtx/number_precision.hpp
-        include/glm/gtx/number_precision.inl
-        include/glm/gtx/optimum_pow.hpp
-        include/glm/gtx/optimum_pow.inl
-        include/glm/gtx/orthonormalize.hpp
-        include/glm/gtx/orthonormalize.inl
-        include/glm/gtx/perpendicular.hpp
-        include/glm/gtx/perpendicular.inl
-        include/glm/gtx/polar_coordinates.hpp
-        include/glm/gtx/polar_coordinates.inl
-        include/glm/gtx/projection.hpp
-        include/glm/gtx/projection.inl
-        include/glm/gtx/quaternion.hpp
-        include/glm/gtx/quaternion.inl
-        include/glm/gtx/range.hpp
-        include/glm/gtx/raw_data.hpp
-        include/glm/gtx/raw_data.inl
-        include/glm/gtx/rotate_normalized_axis.hpp
-        include/glm/gtx/rotate_normalized_axis.inl
-        include/glm/gtx/rotate_vector.hpp
-        include/glm/gtx/rotate_vector.inl
-        include/glm/gtx/scalar_multiplication.hpp
-        include/glm/gtx/scalar_relational.hpp
-        include/glm/gtx/scalar_relational.inl
-        include/glm/gtx/spline.hpp
-        include/glm/gtx/spline.inl
-        include/glm/gtx/std_based_type.hpp
-        include/glm/gtx/std_based_type.inl
-        include/glm/gtx/string_cast.hpp
-        include/glm/gtx/string_cast.inl
-        include/glm/gtx/texture.hpp
-        include/glm/gtx/texture.inl
-        include/glm/gtx/transform.hpp
-        include/glm/gtx/transform.inl
-        include/glm/gtx/transform2.hpp
-        include/glm/gtx/transform2.inl
-        include/glm/gtx/type_aligned.hpp
-        include/glm/gtx/type_aligned.inl
-        include/glm/gtx/type_trait.hpp
-        include/glm/gtx/type_trait.inl
-        include/glm/gtx/vec_swizzle.hpp
-        include/glm/gtx/vector_angle.hpp
-        include/glm/gtx/vector_angle.inl
-        include/glm/gtx/vector_query.hpp
-        include/glm/gtx/vector_query.inl
-        include/glm/gtx/wrap.hpp
-        include/glm/gtx/wrap.inl
-        include/glm/simd/common.h
-        include/glm/simd/exponential.h
-        include/glm/simd/geometric.h
-        include/glm/simd/integer.h
-        include/glm/simd/matrix.h
-        include/glm/simd/neon.h
-        include/glm/simd/packing.h
-        include/glm/simd/platform.h
-        include/glm/simd/trigonometric.h
-        include/glm/simd/vector_relational.h
-        include/glm/common.hpp
-        include/glm/exponential.hpp
-        include/glm/ext.hpp
-        include/glm/fwd.hpp
-        include/glm/geometric.hpp
-        include/glm/glm.hpp
-        include/glm/integer.hpp
-        include/glm/mat2x2.hpp
-        include/glm/mat2x3.hpp
-        include/glm/mat2x4.hpp
-        include/glm/mat3x2.hpp
-        include/glm/mat3x3.hpp
-        include/glm/mat3x4.hpp
-        include/glm/mat4x2.hpp
-        include/glm/mat4x3.hpp
-        include/glm/mat4x4.hpp
-        include/glm/matrix.hpp
-        include/glm/packing.hpp
-        include/glm/trigonometric.hpp
-        include/glm/vec2.hpp
-        include/glm/vec3.hpp
-        include/glm/vec4.hpp
-        include/glm/vector_relational.hpp
-        include/KHR/khrplatform.h
-        include/SOIL.h
-        include/stb_image.h)
+# === basic ===
+add_executable(basic ${COMMON_SRC} graphics_examples/basic/basic.cpp)
+target_link_libraries(basic ${OPENGL_LIBRARIES} glfw3)
 
 
-# 链接 OpenGL, GLFW
-# 这个需要在最后
-#target_link_libraries(first_programs
+# === basic_wrapper ===
+add_executable(basic_wrapper ${COMMON_SRC}
+    graphics_examples/basic_wrapper/basic.cpp
+    graphics_examples/basic_wrapper/basic.vert
+    graphics_examples/basic_wrapper/basic.frag
+    )
+target_link_libraries(basic_wrapper ${OPENGL_LIBRARIES} glfw3)
+
+# Copy basic_wrapper shader files to the build directory (cmake-build-debug)
+file(COPY
+    graphics_examples/basic_wrapper/basic.vert
+    graphics_examples/basic_wrapper/basic.frag
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+    )
+
+# === vertex_attribs ===
+add_executable(vertex_attribs ${COMMON_SRC} graphics_examples/vertex_attribs/vertex_attribs.cpp)
+target_link_libraries(vertex_attribs ${OPENGL_LIBRARIES} glfw3)
+
+# Copy vertex_attribs shader files to the build directory (cmake-build-debug)
+file(COPY
+    graphics_examples/vertex_attribs/vert_attrib.vert
+    graphics_examples/vertex_attribs/vert_attrib.frag
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+    )
+
+# Link OpenGL, GLFW target
+# This usually needs to be put at the end:
+#target_link_libraries(CONFIGURATION_NAME
 #        ${OPENGL_LIBRARIES}
 #        glfw
 #)
-
-# .cpp 是一个独立的 demo → 给每个生成一个 target
-add_executable(basic common/glad.c common/wrapper_glfw.cpp graphics_examples/basic/basic.cpp)
-target_link_libraries(basic ${OPENGL_LIBRARIES} glfw)
-
-add_executable(basic_wrapper common/glad.c common/wrapper_glfw.cpp graphics_examples/basic_wrapper/basic.cpp graphics_examples/basic_wrapper/basic.frag graphics_examples/basic_wrapper/basic.vert)
-target_link_libraries(basic_wrapper ${OPENGL_LIBRARIES} glfw)
-
-# basic_wrapper 特别：把 shader 文件复制到构建目录
-file(COPY
-        graphics_examples/basic_wrapper/basic.vert
-        graphics_examples/basic_wrapper/basic.frag
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-)
-
-add_executable(vertex_attribs common/glad.c common/wrapper_glfw.cpp graphics_examples/vertex_attribs/vertex_attribs.cpp)
-target_link_libraries(vertex_attribs ${OPENGL_LIBRARIES} glfw)
-
-# vertex_attribs 特别：把 shader 文件复制到构建目录
-file(COPY
-        graphics_examples/vertex_attribs/vert_attrib.vert
-        graphics_examples/vertex_attribs/vert_attrib.frag
-        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
-)

@@ -1,0 +1,5 @@
+E:/Project/ClangProjects/opengl-demo/cmake-build-debug/CMakeFiles/basic.dir
+E:/Project/ClangProjects/opengl-demo/cmake-build-debug/CMakeFiles/basic_wrapper.dir
+E:/Project/ClangProjects/opengl-demo/cmake-build-debug/CMakeFiles/vertex_attribs.dir
+E:/Project/ClangProjects/opengl-demo/cmake-build-debug/CMakeFiles/edit_cache.dir
+E:/Project/ClangProjects/opengl-demo/cmake-build-debug/CMakeFiles/rebuild_cache.dir

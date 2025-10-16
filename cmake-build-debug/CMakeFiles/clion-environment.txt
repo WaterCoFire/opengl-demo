@@ -1,0 +1,4 @@
+ToolSet: w64 9.0 (local)@E:\CLion\CLion 2023.1.4\bin\mingw
+Options: 
+
+Options:-DCMAKE_CXX_COMPILER=E:/CLion/CLion 2023.1.4/bin/mingw/bin/g++.exe
