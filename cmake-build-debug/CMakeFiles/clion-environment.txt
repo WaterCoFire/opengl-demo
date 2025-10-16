@@ -1,4 +1,4 @@
-ToolSet: w64 9.0 (local)@E:\CLion\CLion 2023.1.4\bin\mingw
+ToolSet: 1.0 (local)Ninja: 1.12.1@/Applications/CLion.app/Contents/bin/ninja/mac/aarch64/ninja
 Options: 
 
-Options:-DCMAKE_CXX_COMPILER=E:/CLion/CLion 2023.1.4/bin/mingw/bin/g++.exe
+Options:-DCMAKE_MAKE_PROGRAM=/Applications/CLion.app/Contents/bin/ninja/mac/aarch64/ninja
