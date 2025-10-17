@@ -9,7 +9,7 @@
 #pragma comment(lib, "glfw3.lib")
 #endif
 
-// Link to basic OpenGL functinoality (not enough on its own)
+// Link to basic OpenGL functionality (not enough on its own)
 #pragma comment(lib, "opengl32.lib")
 
 /* Include standard libraries */
@@ -102,13 +102,13 @@ void init() {
     inc = 0.001f;
 
     /* Create a vertex buffer object to store our array of vertices */
-    /* A vertext buffer is a memory object that is created and owned by
+    /* A vertex buffer is a memory object that is created and owned by
        the OpenGL context */
 
     /* Generate buffer names (unique index identifiers) */
     glGenBuffers(1, &positionBufferObject);
 
-    /* Specify the current active buffer object by identifer */
+    /* Specify the current active buffer object by identifier */
     glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
 
     /* Allocates OpenGL memory for storing data or indices, any data
@@ -171,7 +171,7 @@ void init() {
 void display() {
     vertexPositions[0] = x;
 
-    /* Update the vertext buffer object with the modified array of vertices */
+    /* Update the vertex buffer object with the modified array of vertices */
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_DYNAMIC_DRAW);
 
     /* Define the background colour*/
@@ -184,7 +184,7 @@ void display() {
     /* Set the current active buffer object */
     glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
 
-    /* Specifies where the dat values accociated with index can accessed in the vertex shader */
+    /* Specifies where the dat values associated with index can be accessed in the vertex shader */
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
     /* Enable  the vertex array associated with the index*/
@@ -199,7 +199,7 @@ void display() {
     glUseProgram(0);
 }
 
-/* Standard main progrm */
+/* Standard main program */
 int main(void) {
     GLFWwindow *window;
 
@@ -212,16 +212,17 @@ int main(void) {
 
     // Personal modification: BELOW
 
-    // 设置 OpenGL 的版本号：4.1
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // 主版本号
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1); // 次版本号
-    // 使用“核心模式”（Core Profile）
-    // 表示只启用现代 OpenGL 的功能，不兼容旧版接口
+    // Set OpenGL version: 4.1
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // Major version num
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1); // Minor versio num
+
+    // Use the "Core Profile"
+    // This indicates enabling only modern OpenGL features, with no compatibility for legacy interfaces
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 #ifdef __APPLE__
-    // macOS 特殊要求：必须设置“前向兼容（Forward Compatible）”
-    // 否则会因为默认禁用 Core Profile 而崩溃
+    // macOS specific requirement: Must set "Forward Compatible"
+    // Otherwise, it will crash due to Core Profile being disabled by default
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 

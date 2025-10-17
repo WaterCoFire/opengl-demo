@@ -36,7 +36,7 @@ set(COMMON_SRC
 
 # === basic ===
 add_executable(basic ${COMMON_SRC} graphics_examples/basic/basic.cpp)
-target_link_libraries(basic PRIVATE ${OPENGL_LIBRARIES} glfw)
+target_link_libraries(basic PRIVATE ${OPENGL_LIBRARIES} glfw3)
 
 # Extra libraries based on different OS
 if (APPLE)
