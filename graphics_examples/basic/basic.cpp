@@ -2,7 +2,7 @@
    with an OpenGL context for AC41001/AC51008, 
    Iain Martin 2022.
 */
-   
+
 /* Link to libraries, could define these as linker inputs in the project settings instead if you prefer */
 #ifdef _DEBUG
 #pragma comment(lib, "glfw3D.lib")
@@ -30,13 +30,19 @@ GLuint positionBufferObject;
 GLuint program;
 GLuint vao;
 GLfloat x;
+GLfloat y; // Personal modification here, to make another vertex move
 GLfloat inc;
 
 /* Array of vertex positions */
 GLfloat vertexPositions[] = {
-    0.75f, 0.75f, 0.0f, 1.0f,
-    0.75f, -0.75f, 0.0f, 1.0f,
-    -0.75f, -0.75f, 0.0f, 1.0f,
+        0.75f, 0.75f, 0.0f, 1.0f,
+        0.75f, -0.75f, 0.0f, 1.0f,
+        -0.75f, -0.75f, 0.0f, 1.0f,
+};
+
+// Personal modification: Second triangle
+// TODO
+GLfloat secondVertexPositions[] = {
 };
 
 /* Build shaders from strings containing shader source code */
@@ -60,11 +66,14 @@ GLuint BuildShader(GLenum eShaderType, const std::string &shaderText) {
 
         const char *strShaderType = NULL;
         switch (eShaderType) {
-            case GL_VERTEX_SHADER: strShaderType = "vertex";
+            case GL_VERTEX_SHADER:
+                strShaderType = "vertex";
                 break;
-            case GL_GEOMETRY_SHADER: strShaderType = "geometry";
+            case GL_GEOMETRY_SHADER:
+                strShaderType = "geometry";
                 break;
-            case GL_FRAGMENT_SHADER: strShaderType = "fragment";
+            case GL_FRAGMENT_SHADER:
+                strShaderType = "fragment";
                 break;
         }
 
@@ -87,6 +96,11 @@ static void error_callback(int error, const char *description) {
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
+
+    // Personal modification for feature
+    if (key == GLFW_KEY_C) {
+        y += (GLfloat) 10 * inc;
+    }
 }
 
 /* Window reshape callback
@@ -106,6 +120,7 @@ void init() {
 
     /* Define animation variables */
     x = 0;
+    y = 0;
     inc = 0.001f;
 
     /* Create a vertex buffer object to store our array of vertices */
@@ -128,23 +143,24 @@ void init() {
     /* Define the vertex shader code as a string */
     // Personal modification: From 330 to 410 core
     const std::string vertexShader(
-        "#version 410 core\n"
-        "layout(location = 0) in vec4 position;\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = position;\n"
-        "}\n"
+            "#version 410 core\n"
+            "layout(location = 0) in vec4 position;\n"
+            "void main()\n"
+            "{\n"
+            "   gl_Position = position;\n"
+            "   gl_PointSize = 10.0;\n" // Personal modification for drawing points
+            "}\n"
     );
 
     /* Define the fragment shader as a string */
     // Personal modification: From 330 to 410 core
     const std::string fragmentShader(
-        "#version 410 core\n"
-        "out vec4 outputColor;\n"
-        "void main()\n"
-        "{\n"
-        "   outputColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);\n"
-        "}\n"
+            "#version 410 core\n"
+            "out vec4 outputColor;\n"
+            "void main()\n"
+            "{\n"
+            "   outputColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);\n"
+            "}\n"
     );
 
     /* Build both shaders */
@@ -177,6 +193,7 @@ void init() {
 /* Rendering function */
 void display() {
     vertexPositions[0] = x;
+    vertexPositions[5] = y;
 
     /* Update the vertex buffer object with the modified array of vertices */
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_DYNAMIC_DRAW);
@@ -187,6 +204,9 @@ void display() {
 
     /* Set the current shader program to be used */
     glUseProgram(program);
+
+    // Personal modification for drawing wireframe triangle
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     /* Set the current active buffer object */
     glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
@@ -199,6 +219,7 @@ void display() {
 
     /* Constructs a sequence of geometric primitives using the elements from the currently
        bound matrix */
+    // Personal modification: GL_TRIANGLES for drawing triangles, GL_POINTS for drawing points
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     /* Disable vertex array and shader program */
@@ -254,6 +275,9 @@ int main(void) {
     glfwSetKeyCallback(window, key_callback);
     glfwSetFramebufferSizeCallback(window, reshape);
 
+    // Personal modification for drawing points
+    glEnable(GL_PROGRAM_POINT_SIZE);
+
     /* Call our own function to perform any setup work*/
     init();
 
@@ -270,6 +294,10 @@ int main(void) {
 
         /* Modify our animation variables */
         x += inc;
+        if (x >= 2 || x <= 0) inc = -inc;
+
+//        y += (GLfloat) 1.5 * inc;
+        if (y >= 2 || y <= 0) inc = -inc;
     }
 
     /* Clean up */

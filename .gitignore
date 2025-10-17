@@ -3,6 +3,12 @@ cmake-build-*/
 build/
 out/
 
+# macOS
+.DS_Store
+
+# JetBrains IDE
+.idea/
+
 # Prerequisites
 *.d
 

@@ -17,7 +17,7 @@ link_directories(${GLFW_DIR}/lib-mingw-w64)  # If using MSVC, change to lib-vc20
 ```
 
 For GLFW on Windows, download at https://www.glfw.org/download.html (Windows pre-compiled libraries). Change the path
-accordingly. If you are not using MinGW as toolchain, change to the correct lib directory.
+accordingly. If not using MinGW as toolchain, change to the correct lib directory.
 
 **Linking GLFW on macOS (Apple Silicon)**
 
@@ -26,12 +26,12 @@ include_directories(/opt/homebrew/include)
 link_directories(/opt/homebrew/lib)
 ```
 
-GLFW can be installed on Mac via Homebrew, so it is assumed here. If you prefer downloading it online, follow the method
-described above.
+GLFW can be installed on Mac via Homebrew, so it is assumed here. If it is downloaded online, follow the method
+described before.
 
 **Extra libraries for macOS**
 
-Somehow when linking glfw3 library instead of glfw on Mac, a bunch of "undefined symbols" errors can occur. This can be
+Somehow when linking `glfw3` library instead of `glfw` on Mac, a bunch of "undefined symbols" errors can occur. This can be
 solved by linking some extra libraries:
 
 ```cmake

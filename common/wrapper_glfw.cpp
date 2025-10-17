@@ -22,7 +22,7 @@ GLWrapper::GLWrapper(int width, int height, const char *title) {
     this->title = title;
     this->fps = 60;
     this->running = true;
-    this->renderer = NULL;
+    this->renderer = nullptr;
 
     /* Initialise GLFW and exit if it fails */
     if (!glfwInit()) {
@@ -44,7 +44,6 @@ GLWrapper::GLWrapper(int width, int height, const char *title) {
     // Otherwise, it will crash due to Core Profile being disabled by default
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
-
 
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #ifdef DEBUG
@@ -101,8 +100,8 @@ void GLWrapper::DisplayVersion() {
     cout << "OpenGL Version = " << major << "." << minor << endl;
 
     /* A more detailed way to the version strings*/
-    cout << "Vender: " << glGetString(GL_VENDOR) << endl;
-    cout << "Version:" << glGetString(GL_VERSION) << endl;
+    cout << "Vendor: " << glGetString(GL_VENDOR) << endl;
+    cout << "Version: " << glGetString(GL_VERSION) << endl;
     cout << "Renderer:" << glGetString(GL_RENDERER) << endl;
 }
 
@@ -170,11 +169,14 @@ GLuint GLWrapper::BuildShader(GLenum eShaderType, const string &shaderText) {
 
         const char *strShaderType = NULL;
         switch (eShaderType) {
-            case GL_VERTEX_SHADER: strShaderType = "vertex";
+            case GL_VERTEX_SHADER:
+                strShaderType = "vertex";
                 break;
-            case GL_GEOMETRY_SHADER: strShaderType = "geometry";
+            case GL_GEOMETRY_SHADER:
+                strShaderType = "geometry";
                 break;
-            case GL_FRAGMENT_SHADER: strShaderType = "fragment";
+            case GL_FRAGMENT_SHADER:
+                strShaderType = "fragment";
                 break;
         }
 

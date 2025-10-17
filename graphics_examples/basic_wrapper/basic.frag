@@ -1,6 +1,6 @@
 // Minimal fragment shader
 
-// // Personal modification 420 to 410 core
+// Personal modification 420 to 410 core
 #version 410 core
 
 out vec4 outputColor;

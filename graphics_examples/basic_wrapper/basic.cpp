@@ -33,9 +33,9 @@ void init(GLWrapper *glw) {
     glBindVertexArray(vao);
 
     float vertexPositions[] = {
-        0.75f, 0.75f, 0.0f, 1.0f,
-        0.75f, -0.75f, 0.0f, 1.0f,
-        -0.75f, -0.75f, 0.0f, 1.0f,
+            0.75f, 0.75f, 0.0f, 1.0f,
+            0.75f, -0.75f, 0.0f, 1.0f,
+            -0.75f, -0.75f, 0.0f, 1.0f,
     };
 
     glGenBuffers(1, &positionBufferObject);
@@ -54,8 +54,8 @@ void init(GLWrapper *glw) {
     glw->DisplayVersion();
 }
 
-//Called to update the display.
-//You should call glfwSwapBuffers() after all of your rendering to display what you rendered.
+// Called to update the display.
+// You should call glfwSwapBuffers() after all of your rendering to display what you rendered.
 void display() {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -95,7 +95,7 @@ static void error_callback(int error, const char *description) {
 
 /* Entry point of program */
 int main(int argc, char *argv[]) {
-    const char *title = "Hello AC41001 and AC51008";
+    const char *title = "Hello World LOL";
     GLWrapper *glw = new GLWrapper(1024, 768, title);
 
     // glad: load all OpenGL function pointers
@@ -114,6 +114,6 @@ int main(int argc, char *argv[]) {
 
     glw->eventLoop();
 
-    delete(glw);
+    delete (glw);
     return 0;
 }
