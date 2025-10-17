@@ -1,5 +1,0 @@
-/Users/watercofire/Projects/ClangProjects/first_programs/cmake-build-debug/CMakeFiles/basic.dir
-/Users/watercofire/Projects/ClangProjects/first_programs/cmake-build-debug/CMakeFiles/basic_wrapper.dir
-/Users/watercofire/Projects/ClangProjects/first_programs/cmake-build-debug/CMakeFiles/vertex_attribs.dir
-/Users/watercofire/Projects/ClangProjects/first_programs/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/watercofire/Projects/ClangProjects/first_programs/cmake-build-debug/CMakeFiles/rebuild_cache.dir

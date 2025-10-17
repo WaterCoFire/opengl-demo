@@ -1,6 +1,7 @@
 /* Basic GLFW3 Example and GLAD example
    with an OpenGL context for AC41001/AC51008, 
    Iain Martin 2022.
+*/
    
 /* Link to libraries, could define these as linker inputs in the project settings instead if you prefer */
 #ifdef _DEBUG
@@ -97,6 +98,12 @@ static void reshape(GLFWwindow *window, int w, int h) {
 
 /* Our own initialisation function */
 void init() {
+    // Personal modification
+    // === Create and bind a VAO (Vertex Array Object) ===
+    // Not adding fails to display the green triangle, somehow
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+
     /* Define animation variables */
     x = 0;
     inc = 0.001f;
@@ -112,10 +119,10 @@ void init() {
     glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
 
     /* Allocates OpenGL memory for storing data or indices, any data
-       previously defined is deleted*/
+       previously defined is deleted */
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_DYNAMIC_DRAW);
 
-    /* Stop using buffer object for target (GL_ARRAY_BUFFER) because buffer name = 0*/
+    /* Stop using buffer object for target (GL_ARRAY_BUFFER) because buffer name = 0 */
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     /* Define the vertex shader code as a string */
@@ -214,7 +221,7 @@ int main(void) {
 
     // Set OpenGL version: 4.1
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); // Major version num
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1); // Minor versio num
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1); // Minor version num
 
     // Use the "Core Profile"
     // This indicates enabling only modern OpenGL features, with no compatibility for legacy interfaces
@@ -227,7 +234,7 @@ int main(void) {
 #endif
 
     /* Create a GLFW window, bail out if it doesn't work */
-    window = glfwCreateWindow(640, 480, "Hello Graphics World", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "Hello Graphics World", nullptr, nullptr);
     if (!window) {
         glfwTerminate();
         exit(EXIT_FAILURE);
@@ -263,7 +270,6 @@ int main(void) {
 
         /* Modify our animation variables */
         x += inc;
-        if (x >= 2 || x <= 0) inc = -inc;
     }
 
     /* Clean up */
