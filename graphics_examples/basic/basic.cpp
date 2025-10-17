@@ -27,6 +27,7 @@
 
 /* Define some global objects that we'll use to render */
 GLuint positionBufferObject;
+GLuint secondPositionBufferObject; // Personal modification here, to display another triangle
 GLuint program;
 GLuint vao;
 GLfloat x;
@@ -35,14 +36,16 @@ GLfloat inc;
 
 /* Array of vertex positions */
 GLfloat vertexPositions[] = {
-        0.75f, 0.75f, 0.0f, 1.0f,
-        0.75f, -0.75f, 0.0f, 1.0f,
-        -0.75f, -0.75f, 0.0f, 1.0f,
+    0.75f, 0.75f, 0.0f, 1.0f,
+    0.75f, -0.75f, 0.0f, 1.0f,
+    -0.75f, -0.75f, 0.0f, 1.0f,
 };
 
 // Personal modification: Second triangle
-// TODO
 GLfloat secondVertexPositions[] = {
+    1.0f, 1.0f, 0.0f, 1.0f,
+    1.0f, -1.0f, 0.0f, 1.0f,
+    -1.0f, -1.0f, 0.0f, 1.0f,
 };
 
 /* Build shaders from strings containing shader source code */
@@ -137,30 +140,36 @@ void init() {
        previously defined is deleted */
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_DYNAMIC_DRAW);
 
+    // Personal modification BELOW - for the second triangle
+    glGenBuffers(1, &secondPositionBufferObject);
+    glBindBuffer(GL_ARRAY_BUFFER, secondPositionBufferObject);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(secondVertexPositions), secondVertexPositions, GL_STATIC_DRAW);
+
     /* Stop using buffer object for target (GL_ARRAY_BUFFER) because buffer name = 0 */
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     /* Define the vertex shader code as a string */
     // Personal modification: From 330 to 410 core
     const std::string vertexShader(
-            "#version 410 core\n"
-            "layout(location = 0) in vec4 position;\n"
-            "void main()\n"
-            "{\n"
-            "   gl_Position = position;\n"
-            "   gl_PointSize = 10.0;\n" // Personal modification for drawing points
-            "}\n"
+        "#version 410 core\n"
+        "layout(location = 0) in vec4 position;\n"
+        "void main()\n"
+        "{\n"
+        "   gl_Position = position;\n"
+        "   gl_PointSize = 10.0;\n" // Personal modification for drawing points
+        "}\n"
     );
 
     /* Define the fragment shader as a string */
     // Personal modification: From 330 to 410 core
     const std::string fragmentShader(
-            "#version 410 core\n"
-            "out vec4 outputColor;\n"
-            "void main()\n"
-            "{\n"
-            "   outputColor = vec4(0.0f, 1.0f, 0.0f, 1.0f);\n"
-            "}\n"
+        "#version 410 core\n"
+        "out vec4 outputColor;\n"
+        "uniform vec4 inColor;\n" // Personal modification: Dynamically pass in color attribute
+        "void main()\n"
+        "{\n"
+        "   outputColor = inColor;\n" // Personal modification: From vec4(0.0f, 1.0f, 0.0f, 1.0f) to inColor
+        "}\n"
     );
 
     /* Build both shaders */
@@ -187,6 +196,11 @@ void init() {
         delete[] strInfoLog;
         throw std::runtime_error("Shader could not be linked.");
     }
+
+    // Personal modification BELOW
+    // Enable transparency blending for overlays
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 
@@ -208,14 +222,33 @@ void display() {
     // Personal modification for drawing wireframe triangle
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+    // Personal modification BELOW
+    // SET COLOR
+    GLint colorLoc = glGetUniformLocation(program, "inColor");
+    glUniform4f(colorLoc, 0.0f, 0.0f, 1.0f, 0.5f); // Set color to blue, 0.5f transparency
+
+    // === Drawing the SECOND (NEW) triangle ===
+
+    // Personal modification BELOW
+    // Draw the second triangle in blue
+    glBindBuffer(GL_ARRAY_BUFFER, secondPositionBufferObject);
+    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    // === Drawing the ORIGINAL triangle ===
+
     /* Set the current active buffer object */
     glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
 
     /* Specifies where the dat values associated with index can be accessed in the vertex shader */
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
 
-    /* Enable  the vertex array associated with the index*/
+    /* Enable the vertex array associated with the index*/
     glEnableVertexAttribArray(0);
+
+    // Set color back to green
+    glUniform4f(colorLoc, 0.0f, 1.0f, 0.0f, 1.0f); // Green
 
     /* Constructs a sequence of geometric primitives using the elements from the currently
        bound matrix */
@@ -296,7 +329,7 @@ int main(void) {
         x += inc;
         if (x >= 2 || x <= 0) inc = -inc;
 
-//        y += (GLfloat) 1.5 * inc;
+        // y += (GLfloat) 1.5 * inc;
         if (y >= 2 || y <= 0) inc = -inc;
     }
 
