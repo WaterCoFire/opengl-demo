@@ -45,8 +45,9 @@ void init(GLWrapper *glw) {
     };
 
     /* Define an array of colours */
+    // Personal modification: Top vertex from white (1 1 1) to red (1 0 0)
     float vertexColours[] = {
-        1.0f, 1.0f, 1.0f, 1.0f,
+        1.0f, 0.0f, 0.0f, 1.0f,
         0.0f, 1.0f, 0.0f, 1.0f,
         0.0f, 0.0f, 1.0f, 1.0f,
     };
@@ -71,8 +72,8 @@ void init(GLWrapper *glw) {
     }
 }
 
-//Called to update the display.
-//You should call glfwSwapBuffers() after all of your rendering to display what you rendered.
+// Called to update the display.
+// You should call glfwSwapBuffers() after all of your rendering to display what you rendered.
 void display() {
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -117,7 +118,7 @@ static void keyCallback(GLFWwindow *window, int k, int s, int action, int mods) 
         glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
-/* An error callback function to output GLFW errors*/
+/* An error callback function to output GLFW errors */
 static void error_callback(int error, const char *description) {
     fputs(description, stderr);
 }

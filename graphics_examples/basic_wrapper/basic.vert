@@ -5,7 +5,11 @@
 
 layout(location = 0) in vec4 position;
 
+// Personal modification for keyboard control
+uniform vec2 offset;
+
 void main()
 {
-	gl_Position = position;
+    // Personal modification: + vec4(offset, 0.0, 0.0)
+	gl_Position = position + vec4(offset, 0.0, 0.0);
 }

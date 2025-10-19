@@ -7,7 +7,7 @@
 
 #include "wrapper_glfw.h"
 
-/* Inlcude some standard headers */
+/* Include some standard headers */
 
 #include <iostream>
 #include <fstream>
@@ -78,7 +78,7 @@ GLWrapper::GLWrapper(int width, int height, const char *title) {
 }
 
 
-/* Terminate GLFW on destruvtion of the wrapepr object */
+/* Terminate GLFW on destruction of the wrapper object */
 GLWrapper::~GLWrapper() {
     glfwTerminate();
 }
@@ -107,7 +107,7 @@ void GLWrapper::DisplayVersion() {
 
 
 /*
-GLFW_Main function normally starts the windows system, calls any init routines
+GLFW_Main function normally starts the window system, calls any init routines
 and then starts the event loop which runs until the program ends
 */
 int GLWrapper::eventLoop() {

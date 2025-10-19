@@ -14,7 +14,7 @@ if you prefer */
 #pragma comment(lib, "opengl32.lib")
 
 /* Include the header to the GLFW wrapper class which
-   also includes the OpenGL extension initialisation*/
+   also includes the OpenGL extension initialisation */
 #include "wrapper_glfw.h"
 #include <iostream>
 
@@ -23,6 +23,14 @@ GLuint program;
 GLuint vao;
 
 using namespace std;
+
+// Personal modification BELOW
+// Global variables for keyboard control
+float offsetX = 0.0f;
+float offsetY = 0.0f;
+float colorR = 0.0f, colorG = 1.0f, colorB = 1.0f; // Initial color
+GLuint offsetLocation;
+GLuint colorLocation;
 
 /*
 This function is called before entering the main rendering loop.
@@ -33,9 +41,9 @@ void init(GLWrapper *glw) {
     glBindVertexArray(vao);
 
     float vertexPositions[] = {
-            0.75f, 0.75f, 0.0f, 1.0f,
-            0.75f, -0.75f, 0.0f, 1.0f,
-            -0.75f, -0.75f, 0.0f, 1.0f,
+        0.75f, 0.75f, 0.0f, 1.0f,
+        0.75f, -0.75f, 0.0f, 1.0f,
+        -0.75f, -0.75f, 0.0f, 1.0f,
     };
 
     glGenBuffers(1, &positionBufferObject);
@@ -52,6 +60,13 @@ void init(GLWrapper *glw) {
     }
 
     glw->DisplayVersion();
+
+    // Personal modification BELOW
+    // For keyboard control
+    glUseProgram(program);
+    offsetLocation = glGetUniformLocation(program, "offset");
+    colorLocation = glGetUniformLocation(program, "color");
+    glUseProgram(0);
 }
 
 // Called to update the display.
@@ -65,6 +80,11 @@ void display() {
     glBindBuffer(GL_ARRAY_BUFFER, positionBufferObject);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+
+    // Personal modification BELOW
+    // Update uniform
+    glUniform2f(offsetLocation, offsetX, offsetY);
+    glUniform3f(colorLocation, colorR, colorG, colorB);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -86,6 +106,27 @@ static void keyCallback(GLFWwindow *window, int k, int s, int action, int mods) 
 
     if (k == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
+
+    // Personal modification below: Key control
+    const float moveStep = 0.05f;
+    const float colorStep = 0.1f;
+
+    switch (k) {
+        case GLFW_KEY_W: offsetY += moveStep;
+            break;
+        case GLFW_KEY_S: offsetY -= moveStep;
+            break;
+        case GLFW_KEY_A: offsetX -= moveStep;
+            break;
+        case GLFW_KEY_D: offsetX += moveStep;
+            break;
+        case GLFW_KEY_R: colorR = fmin(colorR + colorStep, 1.0f);
+            break;
+        case GLFW_KEY_G: colorG = fmin(colorG + colorStep, 1.0f);
+            break;
+        case GLFW_KEY_B: colorB = fmin(colorB + colorStep, 1.0f);
+            break;
+    }
 }
 
 /* An error callback function to output GLFW errors*/

@@ -34,6 +34,8 @@ GLfloat x;
 GLfloat y; // Personal modification here, to make another vertex move
 GLfloat inc;
 
+double startTime; // Personal modification - For advance feature: Animation speed control
+
 /* Array of vertex positions */
 GLfloat vertexPositions[] = {
     0.75f, 0.75f, 0.0f, 1.0f,
@@ -43,9 +45,9 @@ GLfloat vertexPositions[] = {
 
 // Personal modification: Second triangle
 GLfloat secondVertexPositions[] = {
-    1.0f, 1.0f, 0.0f, 1.0f,
-    1.0f, -1.0f, 0.0f, 1.0f,
-    -1.0f, -1.0f, 0.0f, 1.0f,
+    0.5f, 0.5f, 0.0f, 1.0f,
+    0.5f, -0.5f, 0.0f, 1.0f,
+    -0.5f, -0.5f, 0.0f, 1.0f,
 };
 
 /* Build shaders from strings containing shader source code */
@@ -153,9 +155,10 @@ void init() {
     const std::string vertexShader(
         "#version 410 core\n"
         "layout(location = 0) in vec4 position;\n"
+        "uniform vec2 offset;\n" // Personal modification: offset, for advanced animation speed control feature
         "void main()\n"
         "{\n"
-        "   gl_Position = position;\n"
+        "   gl_Position = position + vec4(offset, 0.0, 0.0);\n" // Personal modification: for advanced animation speed control feature: + vec4(offset, 0.0, 0.0)
         "   gl_PointSize = 10.0;\n" // Personal modification for drawing points
         "}\n"
     );
@@ -201,13 +204,17 @@ void init() {
     // Enable transparency blending for overlays
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // Personal modification BELOW
+    // For advanced animation speed control feature
+    startTime = glfwGetTime();
 }
 
 
 /* Rendering function */
 void display() {
     vertexPositions[0] = x;
-    vertexPositions[5] = y;
+    vertexPositions[1] = y; // Personal modification here
 
     /* Update the vertex buffer object with the modified array of vertices */
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_DYNAMIC_DRAW);
@@ -254,6 +261,17 @@ void display() {
        bound matrix */
     // Personal modification: GL_TRIANGLES for drawing triangles, GL_POINTS for drawing points
     glDrawArrays(GL_TRIANGLES, 0, 3);
+
+    // Personal modification BELOW
+    // For advanced feature: Animation speed control feature
+    // Obtain time difference, unit: seconds
+    double currentTime = glfwGetTime();
+    double delta = currentTime - startTime;
+    // Use time to control the animation (left-right panning)
+    float xOffset = sin(delta) * 0.5f; // Oscillates back and forth within the interval [-0.5, 0.5]
+    // Set uniform offset
+    GLint offsetLoc = glGetUniformLocation(program, "offset");
+    glUniform2f(offsetLoc, xOffset, 0.0f);
 
     /* Disable vertex array and shader program */
     glDisableVertexAttribArray(0);
