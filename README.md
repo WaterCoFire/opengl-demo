@@ -1,9 +1,9 @@
-# opengl-demo
+# graphics-lab-1
 
 Used for DI41008 - Graphics module self-learning purpose. **WARNING: DIICSU holds copyright on certain code. Use
 responsibly.**
 
-This project is based on example code provided and modified for macOS (Apple Silicon) and Windows 11 compatibility. I
+This project is based on example code provided in Lab 1 and modified for macOS (Apple Silicon) and Windows 11 compatibility. I
 personally use CLion because I think Visual Studio sucks lmao
 
 Some noteworthy points in CMake file:
@@ -11,7 +11,7 @@ Some noteworthy points in CMake file:
 **Linking GLFW on Windows 11 (should work for Windows 10 as well)**
 
 ```cmake
-set(GLFW_DIR "YOUR_LOCATION_TO/glfw-3.4.bin.WIN64")
+set(GLFW_DIR "YOUR_LOCATION_TO/glfw-3.4.bin.WIN64") # Change this path
 include_directories(${GLFW_DIR}/include)
 link_directories(${GLFW_DIR}/lib-mingw-w64)  # If using MSVC, change to lib-vc2022 or lib-vc2023
 ```
@@ -46,4 +46,15 @@ target_link_libraries(YOUR_CONFIGURATION_NAME
 )
 ```
 
-By WaterCoFire, last updated 17 Oct 2025
+**Copying shader code files**
+
+Seperate shader code files like `.vert` and `.frag` must be in build directory to ensure the program runs properly. This is done like this:
+
+```
+file(COPY
+        YOUR_OWN.vert
+        YOUR_OWN.frag
+        DESTINATION ${CMAKE_CURRENT_BINARY_DIR}
+        )
+```
+By WaterCoFire, last updated 21 Oct 2025
