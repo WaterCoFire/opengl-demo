@@ -50,7 +50,7 @@ target_link_libraries(YOUR_CONFIGURATION_NAME
 
 Seperate shader code files like `.vert` and `.frag` must be in build directory to ensure the program runs properly. This is done like this:
 
-```
+```cmake
 file(COPY
         YOUR_OWN.vert
         YOUR_OWN.frag
